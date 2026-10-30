@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#D7262E">
+<title>Stop entre amigos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Layout: una columna estrecha sobre papel cuadriculado; la palabra STOP es el único gesto grande, en rojo sello. */
+:root{color-scheme:light;
+  --paper:#F7F6EF; --grid:#DCE5EF; --ink:#1E2A44; --muted:#5D6980; --card:#FFFFFF; --line:#CBD5E2;
+  --red:#D7262E; --red-ink:#FFFFFF; --hl:#FFE45C; --on-hl:#1E2A44; --ok:#1C8550; --bad:#B4232A;
+  --f-display:"Bowlby One","Arial Black",Impact,sans-serif;
+  --f-hand:"Kalam","Comic Sans MS","Segoe Print",cursive;
+  --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#161B25; --grid:#222A38; --ink:#E9EEF6; --muted:#9BA7BB; --card:#1F2634; --line:#344157;
+  --red:#FF4A50; --red-ink:#1A0A0B; --hl:#E8CB3C; --on-hl:#1A1F2A; --ok:#4FC48C; --bad:#FF6B70; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#161B25; --grid:#222A38; --ink:#E9EEF6; --muted:#9BA7BB; --card:#1F2634; --line:#344157;
+  --red:#FF4A50; --red-ink:#1A0A0B; --hl:#E8CB3C; --on-hl:#1A1F2A; --ok:#4FC48C; --bad:#FF6B70; color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{margin:0}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+[hidden]{display:none!important}
+body{
+  background-color:var(--paper); color:var(--ink); font-family:var(--f-body); font-size:16px; line-height:1.45;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px; background-attachment:fixed;
+}
+.wrap{max-width:560px;margin:0 auto;padding-block:20px 120px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{margin:0;text-wrap:balance}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--hl);outline-offset:2px}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.label{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+
+/* cabecera */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-family:var(--f-display);font-size:22px;letter-spacing:.02em;color:var(--red);transform:rotate(-3deg);display:inline-block}
+.conn{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--muted)}
+.dot.on{background:var(--ok)}
+
+/* inicio */
+.stamp{font-family:var(--f-display);font-size:clamp(84px,30vw,150px);line-height:.9;color:var(--red);
+  border:8px solid var(--red);border-radius:18px;padding:6px 18px 12px;display:inline-block;transform:rotate(-6deg);
+  align-self:center;margin:18px 0 6px;letter-spacing:.02em}
+.lead{text-align:center;font-size:17px;max-width:30ch;align-self:center}
+.sheet{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:18px;display:flex;flex-direction:column;gap:14px;
+  box-shadow:0 1px 0 var(--line),0 8px 24px -18px rgba(0,0,0,.4)}
+.field{display:flex;flex-direction:column;gap:6px}
+.field input,.field select{border:2px solid var(--line);background:var(--paper);border-radius:6px;padding:12px;font-size:17px;min-width:0}
+.field input:focus{border-color:var(--ink);outline:none}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch}
+.row > *{flex:1 1 140px;min-width:0}
+.btn{border:2px solid var(--ink);background:var(--card);border-radius:8px;padding:12px 16px;font-weight:700;font-size:16px}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.red{background:var(--red);border-color:var(--red);color:var(--red-ink)}
+.btn.ghost{border-color:var(--line);font-weight:400}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.code-in{text-transform:uppercase;letter-spacing:.3em;font-family:var(--f-display)!important}
+.note{border-left:4px solid var(--hl);padding:4px 0 4px 12px;font-size:14px;color:var(--muted)}
+details summary{cursor:pointer;font-weight:700}
+details ul{margin:8px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+
+/* sala */
+.codebox{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.code{font-family:var(--f-display);font-size:40px;letter-spacing:.18em;line-height:1}
+.players{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:0;padding:0}
+.pchip{display:flex;align-items:center;gap:6px;padding:6px 12px 6px 8px;border-radius:999px;border:2px solid var(--line);background:var(--paper);font-family:var(--f-hand);font-size:18px;font-weight:700}
+.pchip i{width:12px;height:12px;border-radius:50%;display:block;flex:none}
+.pchip .tag{font-family:var(--f-body);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.cats{display:flex;flex-wrap:wrap;gap:8px}
+.cat{border:2px dashed var(--line);background:transparent;border-radius:6px;padding:8px 12px;font-size:15px}
+.cat[aria-pressed="true"]{border-style:solid;border-color:var(--ink);background:var(--hl);color:var(--on-hl);font-weight:700}
+.cat:disabled{cursor:default}
+
+/* marcador */
+.board{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.board li{display:grid;grid-template-columns:28px 1fr auto auto;gap:10px;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--line)}
+.board li:last-child{border-bottom:0}
+.board .pos{font-family:var(--f-display);color:var(--muted)}
+.board .nm{font-family:var(--f-hand);font-size:20px;font-weight:700;min-width:0;overflow-wrap:anywhere}
+.board .plus{font-size:14px;color:var(--ok);font-variant-numeric:tabular-nums}
+.board .tot{font-family:var(--f-display);font-size:22px;font-variant-numeric:tabular-nums}
+.board li.first .nm{background:linear-gradient(transparent 55%,var(--hl) 55%);color:var(--ink)}
+
+/* juego */
+.hud{display:flex;align-items:center;gap:16px}
+.letter{font-family:var(--f-display);font-size:84px;line-height:1;width:112px;height:112px;flex:none;display:grid;place-items:center;
+  background:var(--hl);color:var(--on-hl);border-radius:10px;transform:rotate(-4deg);box-shadow:4px 4px 0 var(--ink)}
+.letter.roll{animation:shake .12s linear infinite}
+@keyframes shake{0%{transform:rotate(-6deg)}50%{transform:rotate(3deg)}100%{transform:rotate(-6deg)}}
+.hudinfo{display:flex;flex-direction:column;gap:4px;min-width:0}
+.timer{font-family:var(--f-display);font-size:28px;font-variant-numeric:tabular-nums}
+.timer.low{color:var(--red)}
+.prog{display:flex;flex-wrap:wrap;gap:6px}
+.prog span{font-size:13px;padding:2px 8px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-variant-numeric:tabular-nums}
+.lines{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:4px 16px;display:flex;flex-direction:column}
+.ln{display:grid;grid-template-columns:minmax(90px,38%) 1fr;gap:10px;align-items:end;border-bottom:1.5px solid var(--line);padding:10px 0 4px}
+.ln:last-child{border-bottom:0}
+.ln label{font-size:14px;font-weight:700;color:var(--muted);padding-bottom:6px;overflow-wrap:anywhere}
+.ln input{border:0;background:transparent;font-family:var(--f-hand);font-size:23px;padding:2px 2px 0;min-width:0;width:100%;outline:none}
+.ln input:disabled{opacity:.75}
+.ln.warn input{color:var(--bad)}
+.stopbar{position:fixed;left:0;right:0;bottom:0;padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
+  background:linear-gradient(transparent,var(--paper) 30%);display:flex;justify-content:center}
+.stopbtn{font-family:var(--f-display);font-size:34px;letter-spacing:.06em;width:100%;max-width:528px;padding:14px;border-radius:14px;border:0;
+  background:var(--red);color:var(--red-ink);box-shadow:0 6px 0 color-mix(in srgb,var(--red) 55%,#000)}
+.stopbtn:active:not(:disabled){transform:translateY(4px);box-shadow:0 2px 0 color-mix(in srgb,var(--red) 55%,#000)}
+.stopbtn:disabled{opacity:.4;cursor:not-allowed}
+.hint{text-align:center;font-size:14px;color:var(--muted)}
+
+/* sello de stop */
+.overlay{position:fixed;inset:0;display:grid;place-items:center;background:color-mix(in srgb,var(--paper) 82%,transparent);z-index:20;padding:24px}
+.overlay .stamp{font-size:clamp(90px,34vw,170px);animation:slam .35s cubic-bezier(.2,1.6,.4,1) both;background:var(--paper)}
+.overlay p{text-align:center;font-size:18px;margin:14px 0 0}
+@keyframes slam{from{transform:rotate(-6deg) scale(2.4);opacity:0}to{transform:rotate(-6deg) scale(1);opacity:1}}
+
+/* revisión */
+.rcat{display:flex;flex-direction:column;gap:6px}
+.rcat h3{font-size:15px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.ans{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;width:100%;text-align:left;
+  background:var(--card);border:1px solid var(--line);border-radius:6px;padding:8px 12px}
+.ans .who{font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;max-width:9em;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.ans .who i{width:10px;height:10px;border-radius:50%;flex:none}
+.ans .txt{font-family:var(--f-hand);font-size:21px;min-width:0;overflow-wrap:anywhere}
+.ans .pts{font-family:var(--f-display);font-size:18px;font-variant-numeric:tabular-nums;min-width:2.2em;text-align:right}
+.ans.bad .txt{text-decoration:line-through;text-decoration-color:var(--bad);text-decoration-thickness:2px;color:var(--muted)}
+.ans.bad .pts{color:var(--muted)}
+.ans .why{font-size:12px;color:var(--bad);display:block;font-family:var(--f-body)}
+.ans.mine{cursor:default}
+.ans.voted{border-color:var(--bad);box-shadow:inset 3px 0 0 var(--bad)}
+.foot{display:flex;flex-direction:column;gap:10px}
+@media (prefers-reduced-motion: reduce){.letter.roll,.overlay .stamp{animation:none}}
+</style>
+<script src="https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js"></script>
+</head>
+<body>
+
+<div class="wrap" id="app"></div>
+
+<script>
+(function(){
+"use strict";
+const app=document.getElementById('app');
+const LS={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const H=el=>({set html(v){if(el._h!==v){el._h=v;el.innerHTML=v}}});
+const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9 ]/g,'').replace(/\s+/g,' ').trim();
+
+const POOL=['Nombre','Apellido','Ciudad o país','Animal','Fruta o verdura','Color','Cosa','Marca','Profesión','Comida','Famoso/a','Película o serie','Deporte','Parte del cuerpo','Algo de casa','Canción o grupo','Insulto gracioso','Videojuego'];
+const DEF_CATS=['Nombre','Apellido','Ciudad o país','Animal','Fruta o verdura','Color','Cosa','Marca'];
+const LETTERS='ABCDEFGHIJLMNOPRSTUV';
+const INKS=['#2B59C3','#D7262E','#1C8550','#8E44AD','#D9730D','#0F8B8D','#C2185B','#6D4C41'];
+
+let pid=LS.get('stop.pid');
+if(!pid||!/^p[a-z0-9]{6}$/.test(pid)){pid='p'+(Math.random().toString(36).slice(2)+'000000').slice(0,6);LS.set('stop.pid',pid);}
+const colorOf=id=>{let h=0;for(const c of id)h=(h*31+c.charCodeAt(0))>>>0;return INKS[h%INKS.length]};
+
+/* ---------- red (broker MQTT público, sin cuentas) ---------- */
+const BROKERS=['wss://broker.emqx.io:8084/mqtt','wss://broker.hivemq.com:8884/mqtt'];
+const BASE='kangstop1/';
+const netOk=typeof window.mqtt!=='undefined';
+let R=null, code=null, connected=false, joinedAt=0, noHostSince=null, lastG=null;
+let my={};               // mi presencia local
+let others=new Map();    // pid -> {pres, t}
+let pubTimer=null, beat=null;
+let hostRoundStart=0, hostStopAt=0;
+let screen='start', screenKey='';
+let seenRound=0, roundSeenAt=0, rollUntil=0, wake=null, confirmReset=false;
+
+const myTopic=()=>BASE+code+'/p/'+pid;
+function publishMe(){
+  if(!R||!connected) return;
+  try{ R.publish(myTopic(),JSON.stringify(Object.assign({},my,{ts:Date.now()})),{retain:true,qos:0}); }catch(e){}
+}
+function setP(patch){
+  for(const k in patch){ if(patch[k]===null) delete my[k]; else my[k]=patch[k]; }
+  clearTimeout(pubTimer); pubTimer=setTimeout(publishMe,120);
+  schedule();
+}
+function onMsg(topic,buf){
+  const parts=topic.split('/'); const id=parts[3];
+  if(parts.length!==4||parts[1]!==code||!/^p[a-z0-9]{6}$/.test(id)||id===pid) return;
+  const txt=buf.toString();
+  if(!txt){ others.delete(id); schedule(); return; }
+  let pr; try{ pr=JSON.parse(txt); }catch(e){ return; }
+  if(!pr||typeof pr!=='object'||pr.pid!==id||typeof pr.nick!=='string') return;
+  if(typeof pr.ts==='number'&&Math.abs(Date.now()-pr.ts)>10*60*1000) return;
+  others.set(id,{pres:pr,t:Date.now()}); schedule();
+}
+function peers(){
+  const out=[];
+  const now=Date.now();
+  for(const [id,o] of others){ if(now-o.t>50000){ others.delete(id); continue; } out.push(Object.assign({},o.pres)); }
+  out.push(Object.assign({},my));
+  return out;
+}
+function connectNet(i){
+  return new Promise(resolve=>{
+    if(!netOk||i>=BROKERS.length){ resolve(null); return; }
+    let done=false;
+    const c=window.mqtt.connect(BROKERS[i],{clientId:'ks_'+pid+'_'+Math.random().toString(36).slice(2,7),keepalive:20,clean:true,
+      reconnectPeriod:2000,connectTimeout:7000,will:{topic:myTopic(),payload:'',retain:true,qos:0}});
+    const fail=()=>{ if(done) return; done=true; try{c.end(true)}catch(e){} connectNet(i+1).then(resolve); };
+    const to=setTimeout(fail,8000);
+    c.on('connect',()=>{
+      connected=true; c.subscribe(BASE+code+'/p/+',{qos:0}); publishMe(); schedule();
+      if(!done){ done=true; clearTimeout(to); resolve(c); }
+    });
+    c.on('reconnect',()=>{});
+    c.on('offline',()=>{ connected=false; schedule(); });
+    c.on('close',()=>{ connected=false; schedule(); });
+    c.on('error',()=>{ if(!done) fail(); });
+    c.on('message',onMsg);
+  });
+}
+function currentHost(list){
+  const hs=list.filter(p=>p.g&&p.g.code===code&&typeof p.g.hs==='number');
+  hs.sort((a,b)=>(a.g.hs-b.g.hs)||(a.pid<b.pid?-1:1));
+  return hs[0]||null;
+}
+function freshG(){return{code,phase:'lobby',round:0,letter:'',cats:DEF_CATS.slice(),dur:0,stopBy:null,used:'',tot:{},last:{},names:{},hs:Date.now()}}
+function hostSet(patch){ if(!my.g) return; setP({g:Object.assign({},my.g,patch)}); }
+
+let G=null, LIST=[], amHost=false;
+function sync(){
+  LIST=peers();
+  const h=currentHost(LIST);
+  if(h){
+    lastG=h.g; noHostSince=null;
+    if(my.g&&h.pid!==pid){ setP({g:null}); }
+  }else if(code){
+    if(noHostSince==null) noHostSince=Date.now();
+    const waited=Date.now()-joinedAt>(R?3000:0), gone=Date.now()-noHostSince>(lastG?3000:0);
+    if(waited&&gone){
+      const smallest=LIST.map(p=>p.pid).sort()[0];
+      if(smallest===pid){ setP({g:Object.assign({},lastG||freshG(),{hs:Date.now(),code})}); if(my.g.phase==='play')hostRoundStart=Date.now(); }
+    }
+  }
+  G=my.g||(h&&h.g)||lastG;
+  amHost=!!my.g;
+  if(amHost) hostTick();
+  if(G&&G.phase==='play'&&G.round!==seenRound){
+    seenRound=G.round; roundSeenAt=Date.now(); rollUntil=Date.now()+900;
+    setP({r:G.round,a:G.cats.map(()=>''),stop:null,veto:null});
+    requestWake();
+  }
+}
+function filled(a,n){return Array.isArray(a)&&a.length>=n&&a.slice(0,n).every(x=>String(x||'').trim().length>0)}
+function hostTick(){
+  const g=my.g;
+  if(g.phase==='play'){
+    if(!hostRoundStart) hostRoundStart=Date.now();
+    const caller=LIST.find(p=>p.stop===g.round&&p.r===g.round&&filled(p.a,g.cats.length));
+    const timeUp=g.dur>0&&Date.now()-hostRoundStart>=g.dur*1000+900;
+    if(caller||timeUp){ hostStopAt=Date.now(); hostSet({phase:'stop',stopBy:caller?caller.pid:null}); }
+  }else if(g.phase==='stop'){
+    if(!hostStopAt) hostStopAt=Date.now();
+    if(Date.now()-hostStopAt>2600){ hostStopAt=0; hostSet({phase:'review'}); }
+  }
+}
+
+/* ---------- puntuación ---------- */
+function computeRound(g,list){
+  const players=list.filter(p=>p.r===g.round&&Array.isArray(p.a));
+  const n=players.length, need=Math.floor((n-1)/2)+1;
+  const vc={};
+  list.forEach(p=>{ if(p.veto&&p.veto.r===g.round&&Array.isArray(p.veto.k)) p.veto.k.forEach(k=>{ if(typeof k==='string'&&!k.startsWith(p.pid+'.')) vc[k]=(vc[k]||0)+1; }); });
+  const L=(g.letter||'').toLowerCase(), res={};
+  players.forEach(p=>res[p.pid]={cells:[],total:0});
+  g.cats.forEach((c,ci)=>{
+    const ok=[];
+    players.forEach(p=>{
+      const txt=String(p.a[ci]||'').trim().slice(0,40), nm=norm(txt), v=vc[p.pid+'.'+ci]||0;
+      let why='';
+      if(!nm) why='Vacía'; else if(nm[0]!==L) why='No empieza por '+g.letter; else if(nm.length<2) why='Muy corta'; else if(n>1&&v>=need) why='Rechazada';
+      res[p.pid].cells[ci]={txt,nm,v,why,pts:0};
+      if(!why) ok.push(p.pid);
+    });
+    ok.forEach(id=>{ const cell=res[id].cells[ci]; const same=ok.filter(o=>res[o].cells[ci].nm===cell.nm).length;
+      cell.pts=ok.length===1?20:(same>1?5:10); res[id].total+=cell.pts; });
+  });
+  return {players,res,need};
+}
+
+/* ---------- acciones ---------- */
+function nickOk(){return (my.nick||'').trim().length>0}
+async function enter(c,asHost){
+  code=c; LS.set('stop.nick',my.nick);
+  try{history.replaceState(null,'','#'+code)}catch(e){}
+  my={pid,nick:my.nick.trim().slice(0,18)};
+  others=new Map(); joinedAt=Date.now(); noHostSince=null; lastG=null; seenRound=0; connected=false;
+  if(asHost) my.g=freshG();
+  screen='game'; screenKey=''; schedule();
+  R=await connectNet(0);
+  joinedAt=Date.now();
+  clearInterval(beat); beat=setInterval(publishMe,15000);
+  schedule();
+}
+function createRoom(){
+  const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c=''; for(let i=0;i<4;i++)c+=A[Math.floor(Math.random()*A.length)];
+  enter(c,true);
+}
+async function leave(){
+  clearInterval(beat); clearTimeout(pubTimer);
+  if(R){ try{ R.publish(myTopic(),'',{retain:true,qos:0}); }catch(e){} const c=R; setTimeout(()=>{try{c.end()}catch(e){}},300); }
+  R=null; code=null; connected=false; others=new Map(); my={nick:my.nick}; G=null; screen='start'; screenKey='';
+  try{history.replaceState(null,'',location.pathname)}catch(e){}
+  renderStart();
+}
+window.addEventListener('pagehide',()=>{ if(R&&code){ try{ R.publish(myTopic(),'',{retain:true,qos:0}); }catch(e){} } });
+function startRound(){
+  const g=my.g; if(!g) return;
+  let pool=LETTERS.split('').filter(l=>!g.used.includes(l)); let used=g.used;
+  if(!pool.length){pool=LETTERS.split('');used='';}
+  const letter=pool[Math.floor(Math.random()*pool.length)];
+  hostRoundStart=Date.now(); hostStopAt=0;
+  hostSet({phase:'play',round:g.round+1,letter,used:used+letter,stopBy:null});
+}
+function commitRound(){
+  const g=my.g; if(!g) return;
+  const {players,res}=computeRound(g,LIST);
+  const tot=Object.assign({},g.tot), last={}, names=Object.assign({},g.names);
+  players.forEach(p=>{ tot[p.pid]=(tot[p.pid]||0)+res[p.pid].total; last[p.pid]=res[p.pid].total; names[p.pid]=String(p.nick||'').slice(0,18); });
+  hostSet({phase:'lobby',tot,last,names});
+}
+function requestWake(){ try{ if(navigator.wakeLock&&!wake) navigator.wakeLock.request('screen').then(w=>{wake=w;w.addEventListener('release',()=>wake=null)}).catch(()=>{}); }catch(e){} }
+
+/* ---------- render ---------- */
+let pending=false;
+function schedule(){ if(pending) return; pending=true; requestAnimationFrame(()=>{pending=false; if(screen==='game'){sync();renderGame();}}); }
+setInterval(()=>{ if(screen==='game') schedule(); },500);
+
+function header(){
+  const solo=!R&&!(code&&netOk&&!connected&&Date.now()-joinedAt<9000);
+  return `<div class="top"><span class="brand">STOP</span>
+    <div class="row" style="flex:0 0 auto;gap:12px;align-items:center">
+    <span class="conn"><span class="dot ${solo?'':(connected?'on':'')}"></span>${solo?'Sin conexión':(connected?'Conectado':'Conectando…')}</span>
+    <button class="btn ghost small" id="leave" style="padding:6px 10px">Salir</button></div></div>`;
+}
+function bindHeader(){ const b=document.getElementById('leave'); if(b) b.onclick=leave; }
+
+function renderStart(){
+  screen='start';
+  const saved=LS.get('stop.nick')||my.nick||'';
+  const hashCode=(location.hash||'').replace('#','').toUpperCase();
+  const pre=/^[A-Z0-9]{4}$/.test(hashCode)?hashCode:'';
+  const multi=netOk?'<p class="note">Crea la sala y pasa el código o el enlace a tus amigos. Cada uno lo abre en su móvil, sin registrarse en nada.</p>':'<p class="note">No se ha podido cargar la conexión. Revisa que tengas internet y recarga la página.</p>';
+  app.innerHTML=`
+    <div class="stamp" aria-hidden="true">STOP</div>
+    <p class="lead">Sale una letra. Rellenas cada categoría. El primero que acaba canta <strong>¡STOP!</strong> y se acabó para todos.</p>
+    <div class="sheet">
+      <div class="field"><label class="label" for="nick">Tu nombre</label><input id="nick" maxlength="18" autocomplete="nickname" placeholder="Cómo te verán los demás" value="${esc(saved)}"></div>
+      <div class="field"><label class="label" for="codein">Código de sala</label>
+        <div class="row"><input id="codein" class="code-in" maxlength="4" inputmode="text" autocapitalize="characters" placeholder="ABCD" value="${esc(pre)}">
+        <button class="btn primary" id="join">Entrar</button></div></div>
+      <button class="btn red" id="create">Crear sala nueva</button>
+      ${multi}
+    </div>
+    <details class="sheet"><summary>Cómo se puntúa</summary>
+      <ul class="small">
+        <li><strong>20 puntos</strong> si eres el único con respuesta válida en esa categoría.</li>
+        <li><strong>10 puntos</strong> si tu respuesta no la ha puesto nadie más.</li>
+        <li><strong>5 puntos</strong> si alguien ha escrito lo mismo.</li>
+        <li><strong>0 puntos</strong> si está vacía, no empieza por la letra o la mayoría la rechaza.</li>
+        <li>Para cantar STOP tienes que tener todas las casillas rellenas.</li>
+      </ul></details>`;
+  const nick=document.getElementById('nick'), ci=document.getElementById('codein'), jb=document.getElementById('join'), cb=document.getElementById('create');
+  const upd=()=>{ my.nick=nick.value; const okN=nick.value.trim().length>0; jb.disabled=!(okN&&/^[A-Z0-9]{4}$/.test(ci.value.toUpperCase())); cb.disabled=!okN; };
+  nick.oninput=upd; ci.oninput=()=>{ci.value=ci.value.toUpperCase().replace(/[^A-Z0-9]/g,'');upd();};
+  jb.onclick=()=>{ if(!jb.disabled) enter(ci.value.toUpperCase()); };
+  ci.onkeydown=e=>{ if(e.key==='Enter') jb.click(); };
+  cb.onclick=()=>{ if(!cb.disabled) createRoom(); };
+  upd();
+}
+
+function nameOf(id){ const p=LIST.find(x=>x.pid===id); return (p&&p.nick)||(G&&G.names&&G.names[id])||'Alguien'; }
+
+function renderGame(){
+  if(!G){
+    if(screenKey!=='wait'){screenKey='wait';app.innerHTML=header()+`<div class="sheet"><h2>Sala ${esc(code)}</h2><p class="muted">Buscando la partida…</p></div>`;bindHeader();}
+    else { const h=app.querySelector('.top'); if(h){h.outerHTML=header();bindHeader();} }
+    return;
+  }
+  const ph=G.phase;
+  if(ph==='lobby') return renderLobby();
+  if(ph==='play'||ph==='stop') return renderPlay();
+  if(ph==='review') return renderReview();
+}
+
+/* sala */
+function renderLobby(){
+  const key='lobby-'+G.round+'-'+amHost;
+  if(screenKey!==key){
+    screenKey=key; confirmReset=false;
+    app.innerHTML=header()+`
+      <div class="sheet"><div class="codebox"><div><div class="label">Código de sala</div><div class="code">${esc(code)}</div></div>
+        <button class="btn ghost" id="copy">Invitar</button></div>
+        <div><div class="label" style="margin-bottom:8px">Jugadores</div><ul class="players" id="plist"></ul></div></div>
+      <div class="sheet" id="boardbox" hidden><h2 style="font-size:20px">Marcador</h2><ol class="board" id="board"></ol></div>
+      <div class="sheet"><div><h2 style="font-size:20px">Categorías</h2><p class="small muted" id="catnote" style="margin:4px 0 0"></p></div>
+        <div class="cats" id="cats"></div>
+        ${amHost?`<div class="row"><input id="custom" maxlength="24" placeholder="Añadir otra categoría" class="field" style="border:2px solid var(--line);background:var(--paper);border-radius:6px;padding:10px;font-size:16px"><button class="btn ghost" id="addcat" style="flex:0 0 auto">Añadir</button></div>
+        <div class="field"><label class="label" for="dur">Tiempo límite por ronda</label><select id="dur"><option value="0">Sin límite, hasta que alguien cante STOP</option><option value="60">1 minuto</option><option value="90">1 minuto y medio</option><option value="120">2 minutos</option><option value="180">3 minutos</option></select></div>`:''}
+        <p class="small muted" id="durnote"></p>
+      </div>
+      <div class="foot" id="lfoot"></div>`;
+    bindHeader();
+    const cp=document.getElementById('copy');
+    cp.onclick=()=>{ const url=location.origin+location.pathname+'#'+code;
+      const done=t=>{cp.textContent=t;setTimeout(()=>cp.textContent='Invitar',1800)};
+      if(navigator.share){ navigator.share({title:'Stop',text:'Juega al Stop conmigo. Sala '+code,url}).catch(()=>{}); return; }
+      try{ navigator.clipboard.writeText(url).then(()=>done('Enlace copiado'),()=>done(code)); }catch(e){done(code)} };
+    if(amHost){
+      const add=document.getElementById('addcat'), inp=document.getElementById('custom');
+      add.onclick=()=>{ const v=inp.value.trim().slice(0,24); if(!v) return; const cats=my.g.cats.slice(); if(cats.length>=10||cats.some(c=>norm(c)===norm(v))){inp.value='';return;} cats.push(v); extraCats.add(v); hostSet({cats}); inp.value=''; };
+      inp.onkeydown=e=>{ if(e.key==='Enter') add.click(); };
+      const d=document.getElementById('dur'); d.value=String(my.g.dur||0); d.onchange=()=>hostSet({dur:+d.value});
+    }
+  }
+  // jugadores
+  H(document.getElementById('plist')).html=LIST.map(p=>`<li class="pchip"><i style="background:${colorOf(p.pid)}"></i>${esc(p.nick||'Alguien')}${p.g?'<span class="tag">anfitrión</span>':''}${p.pid===pid?'<span class="tag">tú</span>':''}</li>`).join('');
+  // marcador
+  const ids=Object.keys(G.tot||{});
+  const bb=document.getElementById('boardbox'); bb.hidden=!ids.length;
+  if(ids.length){
+    ids.sort((a,b)=>G.tot[b]-G.tot[a]);
+    H(document.getElementById('board')).html=ids.map((id,i)=>`<li class="${i===0&&G.tot[id]>0?'first':''}"><span class="pos">${i+1}</span><span class="nm">${esc(nameOf(id))}</span><span class="plus">${G.last&&G.last[id]!=null?'+'+G.last[id]:''}</span><span class="tot">${G.tot[id]}</span></li>`).join('');
+  }
+  // categorías
+  const all=[...POOL]; G.cats.forEach(c=>{ if(!all.includes(c)) all.push(c); }); extraCats.forEach(c=>{ if(!all.includes(c)) all.push(c); });
+  const shown=amHost?all:G.cats;
+  const catsEl=document.getElementById('cats');
+  H(catsEl).html=shown.map(c=>`<button class="cat" aria-pressed="${G.cats.includes(c)}" ${amHost?'':'disabled'} data-c="${esc(c)}">${esc(c)}</button>`).join('');
+  if(amHost) catsEl.querySelectorAll('.cat').forEach(b=>b.onclick=()=>{
+    const c=b.dataset.c; let cats=my.g.cats.slice();
+    if(cats.includes(c)){ if(cats.length<=3) return; cats=cats.filter(x=>x!==c); } else { if(cats.length>=10) return; cats.push(c); }
+    hostSet({cats});
+  });
+  document.getElementById('catnote').textContent=amHost?`${G.cats.length} elegidas. Entre 3 y 10.`:`Las elige el anfitrión.`;
+  document.getElementById('durnote').textContent=amHost?'':(G.dur?`Cada ronda dura como mucho ${G.dur>=60?(G.dur/60).toString().replace('.',',')+' min':G.dur+' s'}.`:'Sin límite de tiempo: termina cuando alguien cante STOP.');
+  // pie
+  const f=document.getElementById('lfoot');
+  if(amHost){
+    H(f).html=`<button class="btn red" id="go" style="font-family:var(--f-display);font-size:22px;padding:14px">${G.round?'Siguiente ronda':'Empezar partida'}</button>
+      ${ids.length?`<button class="btn ghost" id="reset">${confirmReset?'Pulsa otra vez para borrar los puntos':'Reiniciar marcador'}</button>`:''}
+      <p class="hint">${LIST.length<2?'Estás solo en la sala. Puedes empezar igualmente o esperar a que entren.':LIST.length+' jugadores listos.'}</p>`;
+    document.getElementById('go').onclick=startRound;
+    const r=document.getElementById('reset');
+    if(r) r.onclick=()=>{ if(!confirmReset){confirmReset=true;schedule();setTimeout(()=>{confirmReset=false;schedule()},4000);return;} confirmReset=false; hostSet({tot:{},last:{},names:{},used:'',round:0}); };
+  }else{
+    const h=LIST.find(p=>p.g);
+    H(f).html=`<p class="hint">Esperando a que ${esc(h?h.nick:'el anfitrión')} empiece la ${G.round?'siguiente ronda':'partida'}.</p>`;
+  }
+}
+const extraCats=new Set();
+
+/* juego */
+function renderPlay(){
+  const key='play-'+G.round;
+  const rolling=Date.now()<rollUntil;
+  if(screenKey!==key){
+    screenKey=key;
+    app.innerHTML=header()+`
+      <div class="hud"><div class="letter" id="letter">${esc(G.letter)}</div>
+        <div class="hudinfo"><div class="label">Ronda ${G.round}</div><div class="timer" id="timer"></div><div class="prog" id="prog"></div></div></div>
+      <div class="lines" id="lines">${G.cats.map((c,i)=>`<div class="ln" id="ln${i}"><label for="a${i}">${esc(c)}</label><input id="a${i}" maxlength="30" autocomplete="off" autocapitalize="sentences" spellcheck="false" enterkeyhint="next"></div>`).join('')}</div>
+      <p class="hint" id="phint"></p>
+      <div class="stopbar"><button class="stopbtn" id="stop">STOP</button></div>
+      <div id="ov"></div>`;
+    bindHeader();
+    G.cats.forEach((c,i)=>{
+      const inp=document.getElementById('a'+i);
+      if(my.a&&my.a[i]) inp.value=my.a[i];
+      inp.oninput=()=>{ const a=(my.a||G.cats.map(()=>'')).slice(); a[i]=inp.value.slice(0,30); setP({a}); };
+      inp.onkeydown=e=>{ if(e.key==='Enter'){ const n=document.getElementById('a'+(i+1)); if(n) n.focus(); else inp.blur(); } };
+    });
+    document.getElementById('stop').onclick=()=>{ if(G.phase==='play'&&filled(my.a,G.cats.length)) setP({stop:G.round}); };
+  }
+  const locked=G.phase!=='play'||rolling;
+  const L=document.getElementById('letter');
+  L.classList.toggle('roll',rolling);
+  L.textContent=rolling?LETTERS[Math.floor(Date.now()/90)%LETTERS.length]:G.letter;
+  G.cats.forEach((c,i)=>{ const inp=document.getElementById('a'+i); if(!inp) return; inp.disabled=locked;
+    const v=norm(inp.value); document.getElementById('ln'+i).classList.toggle('warn',!!v&&v[0]!==G.letter.toLowerCase()); });
+  // temporizador
+  const t=document.getElementById('timer');
+  const el=Math.max(0,(Date.now()-roundSeenAt-900)/1000);
+  if(G.dur){ const left=Math.max(0,Math.ceil(G.dur-el)); t.textContent=`${Math.floor(left/60)}:${String(left%60).padStart(2,'0')}`; t.classList.toggle('low',left<=10); }
+  else { const s=Math.floor(el); t.textContent=`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`; }
+  // progreso
+  const n=G.cats.length;
+  H(document.getElementById('prog')).html=LIST.filter(p=>p.r===G.round).map(p=>{const k=Array.isArray(p.a)?p.a.slice(0,n).filter(x=>String(x||'').trim()).length:0;return `<span style="border-color:${colorOf(p.pid)}">${esc(p.nick||'Alguien')} ${k}/${n}</span>`}).join('');
+  const sb=document.getElementById('stop'); const full=filled(my.a,n);
+  sb.disabled=locked||!full||my.stop===G.round;
+  document.getElementById('phint').textContent=rolling?'Sacando letra…':(G.phase==='play'?(my.stop===G.round?'STOP cantado. Un segundo…':(full?'¡Todo relleno! Ya puedes cantar STOP.':'Rellena todas las casillas para poder cantar STOP.')):'');
+  // sello
+  const ov=document.getElementById('ov');
+  if(G.phase==='stop'&&!ov.firstChild){
+    const who=G.stopBy?(G.stopBy===pid?'Lo has cantado tú':`Lo ha cantado ${esc(nameOf(G.stopBy))}`):'Se acabó el tiempo';
+    ov.innerHTML=`<div class="overlay"><div><div class="stamp" style="display:block">STOP</div><p>${who}. ¡Bolis arriba!</p></div></div>`;
+    document.activeElement&&document.activeElement.blur&&document.activeElement.blur();
+  }
+}
+
+/* revisión */
+function renderReview(){
+  const key='review-'+G.round;
+  if(screenKey!==key){
+    screenKey=key; window.scrollTo(0,0);
+    app.innerHTML=header()+`
+      <div class="hud"><div class="letter">${esc(G.letter)}</div><div class="hudinfo"><div class="label">Ronda ${G.round}</div><h2 style="font-size:22px">Corrección</h2>
+        <p class="small muted" style="margin:0" id="rnote"></p></div></div>
+      <div id="rcats" style="display:flex;flex-direction:column;gap:16px"></div>
+      <div class="sheet"><h2 style="font-size:18px">Puntos de esta ronda</h2><ol class="board" id="rboard"></ol></div>
+      <div class="foot" id="rfoot"></div>`;
+    bindHeader();
+    document.getElementById('rcats').addEventListener('click',e=>{
+      const b=e.target.closest('.ans[data-k]'); if(!b) return;
+      const k=b.dataset.k; const cur=(my.veto&&my.veto.r===G.round&&Array.isArray(my.veto.k))?my.veto.k.slice():[];
+      const i=cur.indexOf(k); if(i>=0) cur.splice(i,1); else cur.push(k);
+      setP({veto:{r:G.round,k:cur}});
+    });
+  }
+  const {players,res,need}=computeRound(G,LIST);
+  const mine=(my.veto&&my.veto.r===G.round&&Array.isArray(my.veto.k))?my.veto.k:[];
+  document.getElementById('rnote').textContent=players.length>1?`Toca una respuesta de otro para rechazarla. Hace falta ${need} ${need===1?'voto':'votos'} para anularla.`:'Comprueba tus respuestas.';
+  H(document.getElementById('rcats')).html=G.cats.map((c,ci)=>`<section class="rcat"><h3>${esc(c)}</h3>${players.map(p=>{
+      const cell=res[p.pid].cells[ci]; const k=p.pid+'.'+ci; const own=p.pid===pid; const can=!own&&players.length>1&&cell.nm;
+      return `<button class="ans ${cell.why?'bad':''} ${own?'mine':''} ${mine.includes(k)?'voted':''}" ${can?`data-k="${k}" aria-pressed="${mine.includes(k)}"`:'disabled'}>
+        <span class="who"><i style="background:${colorOf(p.pid)}"></i>${esc(p.nick||'Alguien')}</span>
+        <span class="txt">${cell.txt?esc(cell.txt):'—'}${cell.why&&cell.txt?`<span class="why">${cell.why}${cell.v?` · ${cell.v} ${cell.v===1?'voto':'votos'}`:''}</span>`:(cell.v?`<span class="why">${cell.v} de ${need} votos para anular</span>`:'')}</span>
+        <span class="pts">${cell.pts}</span></button>`}).join('')}</section>`).join('');
+  const order=players.slice().sort((a,b)=>res[b.pid].total-res[a.pid].total);
+  H(document.getElementById('rboard')).html=order.map((p,i)=>`<li><span class="pos">${i+1}</span><span class="nm">${esc(p.nick||'Alguien')}</span><span class="plus">${G.tot&&G.tot[p.pid]?'total '+(G.tot[p.pid]+res[p.pid].total):''}</span><span class="tot">+${res[p.pid].total}</span></li>`).join('');
+  const f=document.getElementById('rfoot');
+  if(amHost){ H(f).html=`<button class="btn primary" id="commit" style="padding:14px">Sumar puntos y volver a la sala</button>`; document.getElementById('commit').onclick=commitRound; }
+  else H(f).html=`<p class="hint">Cuando todos hayan revisado, el anfitrión suma los puntos.</p>`;
+}
+
+/* arranque */
+my.nick=LS.get('stop.nick')||'';
+renderStart();
+})();
+</script>
+</body>
+</html>
